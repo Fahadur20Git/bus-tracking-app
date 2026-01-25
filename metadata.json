@@ -1,0 +1,7 @@
+{
+  "name": "TN Bus Expert - Tamil Nadu Transit",
+  "description": "Real-time bus tracking and route discovery for Tamil Nadu, covering state-run, private, and rural buses with smart location detection.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
