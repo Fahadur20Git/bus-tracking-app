@@ -49,11 +49,47 @@ export async function detectRoadSegmentAndRoutes(lat: number, lng: number) {
   }
 }
 
+export async function getTravelAnalytics(location: string) {
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: `Provide travel analytics for the area around "${location}" in Tamil Nadu. 
+      Estimate: 
+      1. Percentage of people using Government vs Private buses.
+      2. Hourly passenger demand (0-23 hours).
+      3. Specific insights on night travel (9 PM - 5 AM).
+      4. Daily passenger volume estimate.`,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            govShare: { type: Type.NUMBER, description: "Percentage share of Government buses" },
+            privShare: { type: Type.NUMBER, description: "Percentage share of Private buses" },
+            hourlyDemand: { 
+              type: Type.ARRAY, 
+              items: { type: Type.NUMBER },
+              description: "24 values representing demand intensity 0-100" 
+            },
+            dailyVolume: { type: Type.STRING },
+            nightTravelFactor: { type: Type.STRING },
+            topDestinations: { type: Type.ARRAY, items: { type: Type.STRING } }
+          }
+        }
+      }
+    });
+    return JSON.parse(response.text.trim());
+  } catch (error) {
+    console.error("Gemini Analytics Error:", error);
+    return null;
+  }
+}
+
 export async function searchBusesOnRoute(source: string, destination: string) {
   try {
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      contents: `List all Tamil Nadu bus services (TNSTC, SETC, Private, Mini-buses) operating between ${source} and ${destination}. Include local rural buses.`,
+      contents: `List all Tamil Nadu bus services operating between ${source} and ${destination}.`,
       config: {
         responseMimeType: "application/json",
         responseSchema: {
@@ -92,7 +128,7 @@ export async function getBusStandTimingBoard(standName: string) {
   try {
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      contents: `Create a digital timing board for ${standName} Bus Stand in Tamil Nadu. List 15 upcoming departures.`,
+      contents: `Create a digital timing board for ${standName} Bus Stand.`,
       config: {
         responseMimeType: "application/json",
         responseSchema: {

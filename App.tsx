@@ -8,6 +8,7 @@ import LanguageSwitcher from './components/LanguageSwitcher';
 import MapComponent from './components/MapComponent';
 import RouteSearch from './components/RouteSearch';
 import BusStandBoard from './components/BusStandBoard';
+import TravelAnalytics from './components/TravelAnalytics';
 
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>({
@@ -122,6 +123,12 @@ const App: React.FC = () => {
         >
           📅 {t.tabs.board}
         </button>
+        <button 
+          onClick={() => setState(prev => ({ ...prev, viewMode: 'analytics' }))}
+          className={`flex-1 py-4 px-6 border-b-4 transition-all whitespace-nowrap ${state.viewMode === 'analytics' ? 'border-white text-white bg-emerald-700' : 'border-transparent hover:bg-emerald-700/50'}`}
+        >
+          📊 {t.tabs.analytics}
+        </button>
       </nav>
 
       <main className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
@@ -195,6 +202,12 @@ const App: React.FC = () => {
         {state.viewMode === 'board' && (
           <div className="flex-1 overflow-y-auto bg-gray-100 p-4">
             <BusStandBoard language={state.language} />
+          </div>
+        )}
+
+        {state.viewMode === 'analytics' && (
+          <div className="flex-1 overflow-y-auto bg-gray-100 p-4">
+            <TravelAnalytics language={state.language} location={state.locationDetails} />
           </div>
         )}
       </main>

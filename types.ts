@@ -23,7 +23,6 @@ export interface BusRoute {
   imageUrl?: string;
   frequencyMinutes?: number;
   eta?: number;
-  // New timing fields
   departureTimeFromStand?: string;
   arrivalTimeAtDestination?: string;
   timeAtYourLocation?: string;
@@ -44,7 +43,7 @@ export interface LiveBus {
   occupancy: 'Low' | 'Medium' | 'High';
 }
 
-export type ViewMode = 'map' | 'search' | 'board';
+export type ViewMode = 'map' | 'search' | 'board' | 'analytics';
 
 export interface AppState {
   userLocation: [number, number] | null;

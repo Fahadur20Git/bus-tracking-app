@@ -21,7 +21,23 @@ export const TRANSLATIONS = {
     tabs: {
       nearby: "Nearby",
       search: "Search Route",
-      board: "Bus Stand Board"
+      board: "Bus Stand Board",
+      analytics: "Travel Insights"
+    },
+    analytics: {
+      title: "Regional Travel Analytics",
+      subtitle: "Data-driven insights for",
+      govVsPriv: "Operator Market Share",
+      govLabel: "Government (TNSTC/MTC)",
+      privLabel: "Private Operators",
+      peakTitle: "Passenger Demand by Hour",
+      nightInsight: "Night Travel Trend",
+      nightDesc: "Night express buses see 40% higher occupancy between 9 PM and 4 AM.",
+      loading: "Analyzing regional travel data...",
+      crowdLevel: "Crowd Forecast",
+      high: "High Demand",
+      med: "Moderate",
+      low: "Peaceful"
     },
     search: {
       from: "From (Source)",
@@ -54,14 +70,30 @@ export const TRANSLATIONS = {
     trips: "பயணங்கள்/நாள்",
     firstLast: "முதல்/கடைசி",
     walkToRoute: "வழித்தடத்திற்குச் செல்லுங்கள்",
-    noBuses: "இந்தச் சாலைப் பகுதியில் இன்னும் பேருந்துகள் கண்டறியப்படவில்லை.",
+    noBuses: "இந்தச் சாலைப் பகுதியில் இன்னும் பேருந்து கண்டறியப்படவில்லை.",
     changeLang: "English",
     searchPlaceholder: "இலக்கைத் தேடுங்கள்...",
     loadingInfo: "சாலைப் பகுதிகளை ஆய்வு செய்ய AI ஐப் பயன்படுத்துகிறது...",
     tabs: {
       nearby: "அருகிலுள்ளவை",
       search: "வழித்தடத் தேடல்",
-      board: "பேருந்து நிலைய பலகை"
+      board: "பேருந்து நிலைய பலகை",
+      analytics: "பயண ஆய்வுகள்"
+    },
+    analytics: {
+      title: "பிராந்திய பயண ஆய்வுகள்",
+      subtitle: "இதற்கான தரவு அடிப்படையிலான நுண்ணறிவு:",
+      govVsPriv: "பேருந்து நிறுவனங்களின் பங்கு",
+      govLabel: "அரசு (TNSTC/MTC)",
+      privLabel: "தனியார் நிறுவனங்கள்",
+      peakTitle: "நேர வாரியாக பயணிகளின் தேவை",
+      nightInsight: "இரவு பயணப் போக்கு",
+      nightDesc: "இரவு 9 மணி முதல் அதிகாலை 4 மணி வரை இரவு விரைவுப் பேருந்துகளில் 40% அதிக பயணிகள் உள்ளனர்.",
+      loading: "பிராந்திய பயணத் தரவை ஆய்வு செய்கிறது...",
+      crowdLevel: "கூட்ட முன்னறிவிப்பு",
+      high: "அதிக தேவை",
+      med: "மிதமான",
+      low: "அமைதியான"
     },
     search: {
       from: "கிளம்பும் இடம்",
@@ -83,30 +115,3 @@ export const TRANSLATIONS = {
     }
   }
 };
-
-export const SAMPLE_BUSES = [
-  {
-    id: "route-1",
-    busNumber: "21G",
-    name: "Broadway to Vandalur",
-    type: "MTC (Chennai City)",
-    source: "Broadway",
-    destination: "Vandalur Zoo",
-    firstBus: "05:00 AM",
-    lastBus: "10:30 PM",
-    tripsPerDay: 48,
-    imageUrl: "https://picsum.photos/seed/bus1/400/300",
-  },
-  {
-    id: "route-2",
-    busNumber: "P-45",
-    name: "Rural Express",
-    type: "Private Bus",
-    source: "Kattumannarkoil",
-    destination: "Lalpet",
-    firstBus: "06:15 AM",
-    lastBus: "08:45 PM",
-    tripsPerDay: 12,
-    imageUrl: "https://picsum.photos/seed/bus2/400/300",
-  }
-];
