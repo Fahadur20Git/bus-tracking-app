@@ -8,12 +8,11 @@ export async function detectRoadSegmentAndRoutes(lat: number, lng: number) {
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: `You are a Tamil Nadu bus expert. A user is at coordinates ${lat}, ${lng}. 
-      1. Identify the specific road segment, village, or town they are in.
-      2. List at least 8 major and local bus routes (TNSTC, SETC, MTC, Private, or Rural Mini Buses) that pass through this exact point.
-      3. For each, provide Bus Number, Name, Source, Destination, and Estimated Frequency.
-      4. Include specific timing: what time do buses usually pass this exact coordinate?`,
+      1. Identify the specific road segment or village they are in.
+      2. List at least 8 major bus routes (Government TNSTC, SETC, MTC, or Private) that pass through this exact point.
+      3. For each route, provide the Bus Number, Name, Source, Destination, Estimated Frequency, and Estimated time it passes this point.
+      4. If this is a rural area between two towns, explicitly mention that.`,
       config: {
-        tools: [{ googleSearch: {} }],
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
@@ -33,7 +32,8 @@ export async function detectRoadSegmentAndRoutes(lat: number, lng: number) {
                   frequencyMinutes: { type: Type.NUMBER },
                   estimatedArrivalTimeMinutes: { type: Type.NUMBER },
                   timeAtYourLocation: { type: Type.STRING }
-                }
+                },
+                required: ["busNumber", "name", "source", "destination"]
               }
             }
           },
@@ -49,20 +49,12 @@ export async function detectRoadSegmentAndRoutes(lat: number, lng: number) {
   }
 }
 
-export async function searchBusesOnRoute(source: string, destination: string, userLocationName: string = "") {
+export async function searchBusesOnRoute(source: string, destination: string) {
   try {
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      contents: `List ALL Tamil Nadu bus services (TNSTC, SETC, Private) between ${source} and ${destination}. 
-      Include every possible rural bus that connects these points.
-      For each bus, provide:
-      - Departure time from ${source}
-      - Arrival time at ${destination}
-      - If they pass through ${userLocationName}, estimate what time they will be there.
-      - Frequency and total trips.
-      Use real timing data found via search.`,
+      contents: `List all Tamil Nadu bus services (TNSTC, SETC, Private, Mini-buses) operating between ${source} and ${destination}. Include local rural buses.`,
       config: {
-        tools: [{ googleSearch: {} }],
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
@@ -76,11 +68,12 @@ export async function searchBusesOnRoute(source: string, destination: string, us
                   busNumber: { type: Type.STRING },
                   name: { type: Type.STRING },
                   type: { type: Type.STRING },
-                  departureTime: { type: Type.STRING },
-                  arrivalTime: { type: Type.STRING },
-                  timeAtUserLocation: { type: Type.STRING },
+                  firstBus: { type: Type.STRING },
+                  lastBus: { type: Type.STRING },
                   frequencyMinutes: { type: Type.NUMBER },
-                  tripsPerDay: { type: Type.NUMBER }
+                  tripsPerDay: { type: Type.NUMBER },
+                  departureTime: { type: Type.STRING },
+                  arrivalTime: { type: Type.STRING }
                 }
               }
             }
@@ -99,11 +92,8 @@ export async function getBusStandTimingBoard(standName: string) {
   try {
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      contents: `Search for the ACTUAL current or standard timing board for ${standName} Bus Stand in Tamil Nadu. 
-      List 15 upcoming or major departures covering all directions (State, Town, and Village routes).
-      Include Platform number if known. Use real names and bus numbers.`,
+      contents: `Create a digital timing board for ${standName} Bus Stand in Tamil Nadu. List 15 upcoming departures.`,
       config: {
-        tools: [{ googleSearch: {} }],
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,

@@ -13,9 +13,14 @@ const BusStandBoard: React.FC<{ language: 'en' | 'ta' }> = ({ language }) => {
     e.preventDefault();
     if (!standName) return;
     setLoading(true);
-    const data = await getBusStandTimingBoard(standName);
-    setBoardData(data);
-    setLoading(false);
+    try {
+      const data = await getBusStandTimingBoard(standName);
+      setBoardData(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -41,7 +46,6 @@ const BusStandBoard: React.FC<{ language: 'en' | 'ta' }> = ({ language }) => {
 
       {boardData && (
         <div className="bg-zinc-900 rounded-xl overflow-hidden shadow-2xl border-4 border-zinc-800">
-          {/* Header Area of the Board */}
           <div className="bg-zinc-800 p-4 flex justify-between items-center border-b border-zinc-700">
             <div>
               <h3 className="text-yellow-500 font-mono text-xl font-bold tracking-widest">{boardData.standName.toUpperCase()}</h3>
@@ -53,9 +57,8 @@ const BusStandBoard: React.FC<{ language: 'en' | 'ta' }> = ({ language }) => {
             </div>
           </div>
 
-          {/* Table Area */}
           <div className="overflow-x-auto">
-            <table className="w-full text-left font-mono">
+            <table className="w-full text-left font-mono text-xs">
               <thead className="bg-zinc-800 text-zinc-400 text-[10px] uppercase tracking-tighter">
                 <tr>
                   <th className="px-6 py-2">NO.</th>
@@ -96,7 +99,6 @@ const BusStandBoard: React.FC<{ language: 'en' | 'ta' }> = ({ language }) => {
             </table>
           </div>
 
-          {/* Footer Area with ticker-like vibe */}
           <div className="bg-zinc-800 p-2 overflow-hidden whitespace-nowrap">
             <div className="inline-block animate-[marquee_20s_linear_infinite] text-orange-500/50 text-[10px] font-mono tracking-widest uppercase">
               +++ PLEASE WEAR MASKS IN CROWDED BUSES +++ CHECK LIVE STATUS FOR ACCURATE TIMINGS +++ TNSTC / SETC HELPLINE: 1800 599 1500 +++

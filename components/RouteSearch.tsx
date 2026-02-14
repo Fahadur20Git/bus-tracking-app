@@ -5,7 +5,7 @@ import { searchBusesOnRoute } from '../services/geminiService';
 import BusCard from './BusCard';
 import { BusRoute, BusType } from '../types';
 
-const RouteSearch: React.FC<{ language: 'en' | 'ta', currentLocationName?: string }> = ({ language, currentLocationName }) => {
+const RouteSearch: React.FC<{ language: 'en' | 'ta' }> = ({ language }) => {
   const [source, setSource] = useState('');
   const [dest, setDest] = useState('');
   const [loading, setLoading] = useState(false);
@@ -16,9 +16,14 @@ const RouteSearch: React.FC<{ language: 'en' | 'ta', currentLocationName?: strin
     e.preventDefault();
     if (!source || !dest) return;
     setLoading(true);
-    const data = await searchBusesOnRoute(source, dest, currentLocationName);
-    setResults(data);
-    setLoading(false);
+    try {
+      const data = await searchBusesOnRoute(source, dest);
+      setResults(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -80,7 +85,6 @@ const RouteSearch: React.FC<{ language: 'en' | 'ta', currentLocationName?: strin
                 frequencyMinutes: bus.frequencyMinutes,
                 departureTimeFromStand: bus.departureTime,
                 arrivalTimeAtDestination: bus.arrivalTime,
-                timeAtYourLocation: bus.timeAtUserLocation
               };
               return (
                 <BusCard 
