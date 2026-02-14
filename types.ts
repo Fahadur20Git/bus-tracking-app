@@ -23,6 +23,10 @@ export interface BusRoute {
   imageUrl?: string;
   frequencyMinutes?: number;
   eta?: number;
+  // New timing fields
+  departureTimeFromStand?: string;
+  arrivalTimeAtDestination?: string;
+  timeAtYourLocation?: string;
 }
 
 export interface BusStop {

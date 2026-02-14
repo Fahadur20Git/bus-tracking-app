@@ -5,7 +5,7 @@ import { searchBusesOnRoute } from '../services/geminiService';
 import BusCard from './BusCard';
 import { BusRoute, BusType } from '../types';
 
-const RouteSearch: React.FC<{ language: 'en' | 'ta' }> = ({ language }) => {
+const RouteSearch: React.FC<{ language: 'en' | 'ta', currentLocationName?: string }> = ({ language, currentLocationName }) => {
   const [source, setSource] = useState('');
   const [dest, setDest] = useState('');
   const [loading, setLoading] = useState(false);
@@ -16,7 +16,7 @@ const RouteSearch: React.FC<{ language: 'en' | 'ta' }> = ({ language }) => {
     e.preventDefault();
     if (!source || !dest) return;
     setLoading(true);
-    const data = await searchBusesOnRoute(source, dest);
+    const data = await searchBusesOnRoute(source, dest, currentLocationName);
     setResults(data);
     setLoading(false);
   };
@@ -31,7 +31,7 @@ const RouteSearch: React.FC<{ language: 'en' | 'ta' }> = ({ language }) => {
               value={source}
               onChange={(e) => setSource(e.target.value)}
               className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
-              placeholder="e.g. Trichy"
+              placeholder="e.g. Coimbatore"
             />
           </div>
           <div>
@@ -40,7 +40,7 @@ const RouteSearch: React.FC<{ language: 'en' | 'ta' }> = ({ language }) => {
               value={dest}
               onChange={(e) => setDest(e.target.value)}
               className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
-              placeholder="e.g. Madurai"
+              placeholder="e.g. Pollachi"
             />
           </div>
           <button 
@@ -63,7 +63,7 @@ const RouteSearch: React.FC<{ language: 'en' | 'ta' }> = ({ language }) => {
             </span>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             {results.buses.map((bus: any, idx: number) => {
               const busData: BusRoute = {
                 id: `search-${idx}`,
@@ -72,19 +72,22 @@ const RouteSearch: React.FC<{ language: 'en' | 'ta' }> = ({ language }) => {
                 type: bus.type as BusType,
                 source: source,
                 destination: dest,
-                firstBus: bus.firstBus,
-                lastBus: bus.lastBus,
+                firstBus: bus.firstBus || bus.departureTime,
+                lastBus: bus.lastBus || "N/A",
                 tripsPerDay: bus.tripsPerDay,
                 path: [],
                 stops: [],
-                frequencyMinutes: bus.frequencyMinutes
+                frequencyMinutes: bus.frequencyMinutes,
+                departureTimeFromStand: bus.departureTime,
+                arrivalTimeAtDestination: bus.arrivalTime,
+                timeAtYourLocation: bus.timeAtUserLocation
               };
               return (
                 <BusCard 
                   key={idx} 
                   bus={busData} 
                   language={language} 
-                  isSelected={false} 
+                  isSelected={true} 
                   onSelect={() => {}} 
                 />
               );

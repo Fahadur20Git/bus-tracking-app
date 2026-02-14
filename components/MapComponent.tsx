@@ -17,16 +17,20 @@ const MapComponent: React.FC<MapComponentProps> = ({ userLocation, liveBuses, on
   useEffect(() => {
     if (!mapContainerRef.current || mapInstanceRef.current) return;
 
-    // Initialize map
     const L = (window as any).L;
     if (!L) return;
 
-    const initialPos = userLocation || [10.7905, 78.7047]; // Default to TN center if null
-    mapInstanceRef.current = L.map(mapContainerRef.current).setView(initialPos, 13);
+    const initialPos = userLocation || [10.7905, 78.7047];
+    mapInstanceRef.current = L.map(mapContainerRef.current, {
+      zoomControl: false // Custom controls for better touch UX
+    }).setView(initialPos, 13);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
     }).addTo(mapInstanceRef.current);
+
+    // Add Zoom Control to Bottom Right
+    L.control.zoom({ position: 'bottomright' }).addTo(mapInstanceRef.current);
 
     return () => {
       if (mapInstanceRef.current) {
@@ -36,7 +40,6 @@ const MapComponent: React.FC<MapComponentProps> = ({ userLocation, liveBuses, on
     };
   }, []);
 
-  // Update User Location Marker
   useEffect(() => {
     const L = (window as any).L;
     if (!L || !mapInstanceRef.current || !userLocation) return;
@@ -46,21 +49,22 @@ const MapComponent: React.FC<MapComponentProps> = ({ userLocation, liveBuses, on
     } else {
       const userIcon = L.divIcon({
         className: 'user-marker',
-        html: `<div class="w-6 h-6 bg-blue-500 border-4 border-white rounded-full shadow-lg ring-4 ring-blue-500/30"></div>`,
-        iconSize: [24, 24],
-        iconAnchor: [12, 12]
+        html: `<div class="w-8 h-8 flex items-center justify-center">
+                <div class="absolute w-full h-full bg-blue-500 opacity-20 rounded-full animate-ping"></div>
+                <div class="relative w-5 h-5 bg-blue-600 border-4 border-white rounded-full shadow-lg ring-2 ring-blue-500"></div>
+              </div>`,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
       });
       userMarkerRef.current = L.marker(userLocation, { icon: userIcon }).addTo(mapInstanceRef.current);
-      mapInstanceRef.current.panTo(userLocation);
+      mapInstanceRef.current.setView(userLocation, 14);
     }
   }, [userLocation]);
 
-  // Update Live Bus Markers
   useEffect(() => {
     const L = (window as any).L;
     if (!L || !mapInstanceRef.current) return;
 
-    // Clear removed buses
     const currentBusIds = new Set(liveBuses.map(b => b.id));
     busMarkersRef.current.forEach((marker, id) => {
       if (!currentBusIds.has(id)) {
@@ -69,7 +73,6 @@ const MapComponent: React.FC<MapComponentProps> = ({ userLocation, liveBuses, on
       }
     });
 
-    // Add/Update markers
     liveBuses.forEach(bus => {
       if (busMarkersRef.current.has(bus.id)) {
         busMarkersRef.current.get(bus.id).setLatLng(bus.currentLocation);
@@ -77,15 +80,15 @@ const MapComponent: React.FC<MapComponentProps> = ({ userLocation, liveBuses, on
         const busIcon = L.divIcon({
           className: 'bus-marker',
           html: `
-            <div class="relative group cursor-pointer">
-              <div class="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center border-2 border-white shadow-xl rotate-[${bus.heading}deg]">
-                <span class="text-white text-lg -rotate-[${bus.heading}deg]">🚌</span>
+            <div class="relative flex flex-col items-center">
+              <div class="w-12 h-12 bg-emerald-700 rounded-2xl flex items-center justify-center border-4 border-white shadow-2xl transition-transform hover:scale-110 active:scale-95" style="transform: rotate(${bus.heading}deg)">
+                 <span class="text-white text-xl" style="transform: rotate(${-bus.heading}deg)">🚌</span>
               </div>
-              <div class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 border-2 border-white rounded-full"></div>
+              <div class="mt-1 bg-white px-2 py-0.5 rounded text-[8px] font-bold shadow-sm border border-emerald-100">Live</div>
             </div>
           `,
-          iconSize: [40, 40],
-          iconAnchor: [20, 20]
+          iconSize: [48, 64],
+          iconAnchor: [24, 32]
         });
 
         const marker = L.marker(bus.currentLocation, { icon: busIcon })
@@ -97,7 +100,18 @@ const MapComponent: React.FC<MapComponentProps> = ({ userLocation, liveBuses, on
     });
   }, [liveBuses, onBusSelect]);
 
-  return <div ref={mapContainerRef} className="w-full h-full" />;
+  return (
+    <div className="w-full h-full relative group">
+      <div ref={mapContainerRef} className="w-full h-full" />
+      {/* Quick Center Control Overlay */}
+      <button 
+        onClick={() => userLocation && mapInstanceRef.current?.setView(userLocation, 15)}
+        className="absolute top-20 right-4 z-10 bg-white p-3 rounded-xl shadow-xl border border-gray-100 hover:bg-gray-50 active:scale-90 transition-all text-xl"
+      >
+        🎯
+      </button>
+    </div>
+  );
 };
 
 export default MapComponent;

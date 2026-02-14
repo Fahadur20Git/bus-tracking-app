@@ -4,7 +4,7 @@ import { BusRoute } from '../types';
 import { TRANSLATIONS } from '../constants';
 
 interface BusCardProps {
-  bus: BusRoute & { eta?: number };
+  bus: BusRoute;
   language: 'en' | 'ta';
   isSelected: boolean;
   onSelect: () => void;
@@ -20,64 +20,59 @@ const BusCard: React.FC<BusCardProps> = ({ bus, language, isSelected, onSelect }
         isSelected ? 'border-emerald-500 ring-2 ring-emerald-100' : 'border-transparent hover:border-emerald-200'
       }`}
     >
-      <div className="flex">
-        {/* Thumbnail for Private Buses */}
-        {bus.type.includes('Private') && bus.imageUrl && (
-          <div className="w-24 h-auto shrink-0 relative overflow-hidden hidden sm:block">
-            <img 
-              src={bus.imageUrl} 
-              alt={bus.name} 
-              className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform"
-            />
-            <div className="absolute top-1 left-1 bg-yellow-400 text-[10px] font-bold px-1 rounded shadow">PRIVATE</div>
+      <div className="flex flex-col sm:flex-row">
+        {/* Thumbnail for Private Buses or Highlights */}
+        <div className="sm:w-32 bg-gray-50 flex flex-col items-center justify-center p-3 border-b sm:border-b-0 sm:border-r border-gray-100 shrink-0">
+          <span className="bg-emerald-600 text-white text-xs font-bold px-2 py-1 rounded-md mb-2 w-full text-center">
+            {bus.busNumber}
+          </span>
+          <div className="text-center">
+             <div className="text-[10px] uppercase text-gray-500 font-bold mb-1 tracking-tighter line-clamp-2">{bus.type}</div>
           </div>
-        )}
+          {bus.imageUrl && (
+            <img src={bus.imageUrl} className="w-12 h-12 object-cover rounded-full mt-1 hidden sm:block border-2 border-emerald-100" />
+          )}
+        </div>
 
         <div className="p-4 flex-1">
-          <div className="flex justify-between items-start mb-2">
-            <div>
-              <span className="inline-block bg-emerald-600 text-white text-xs font-bold px-2 py-0.5 rounded-full mb-1">
-                {bus.busNumber}
-              </span>
-              <h3 className="font-bold text-gray-900 leading-tight">{bus.name}</h3>
-              <p className="text-[10px] uppercase text-gray-500 font-semibold tracking-wider">{bus.type}</p>
-            </div>
-            <div className="text-right">
-              <div className="text-xs text-emerald-600 font-bold mb-1 flex items-center justify-end gap-1">
-                <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                {t.live}
-              </div>
-              <div className="text-emerald-700">
+          <div className="flex justify-between items-start mb-3">
+            <h3 className="font-bold text-gray-900 leading-tight text-lg">{bus.name}</h3>
+            {bus.eta !== undefined && (
+              <div className="text-right text-emerald-700">
                 <span className="text-2xl font-black">{bus.eta}</span>
-                <span className="text-xs font-bold ml-1 uppercase">{t.mins}</span>
+                <span className="text-[10px] font-bold ml-1 uppercase">{t.mins}</span>
               </div>
-            </div>
+            )}
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-gray-600 mb-3 bg-gray-50 p-2 rounded">
-            <div className="shrink-0 flex flex-col items-center">
-              <div className="w-2 h-2 rounded-full border-2 border-gray-400"></div>
-              <div className="w-0.5 h-3 bg-gray-300"></div>
-              <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+          {/* Timing Visualizer */}
+          <div className="grid grid-cols-3 gap-1 mb-4">
+            <div className="bg-zinc-50 p-2 rounded-l-lg border-l-4 border-emerald-500 text-center">
+              <div className="text-[9px] text-gray-400 font-bold uppercase">Starts</div>
+              <div className="text-sm font-bold text-zinc-800">{bus.departureTimeFromStand || bus.firstBus}</div>
+              <div className="text-[8px] text-zinc-400 truncate">{bus.source}</div>
             </div>
-            <div className="truncate">
-              <span className="opacity-60">{bus.source}</span>
-              <span className="mx-1">→</span>
-              <span className="font-semibold text-gray-800">{bus.destination}</span>
+            
+            <div className={`p-2 text-center flex flex-col justify-center relative ${bus.timeAtYourLocation ? 'bg-emerald-50 border-y border-emerald-200' : 'bg-gray-50'}`}>
+              <div className="text-[9px] text-emerald-600 font-bold uppercase">Passes You</div>
+              <div className="text-sm font-black text-emerald-700">{bus.timeAtYourLocation || '--:--'}</div>
+              <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-emerald-100 -z-10"></div>
+            </div>
+
+            <div className="bg-zinc-50 p-2 rounded-r-lg border-r-4 border-zinc-300 text-center">
+              <div className="text-[9px] text-gray-400 font-bold uppercase">Arrival</div>
+              <div className="text-sm font-bold text-zinc-800">{bus.arrivalTimeAtDestination || '--:--'}</div>
+              <div className="text-[8px] text-zinc-400 truncate">{bus.destination}</div>
             </div>
           </div>
 
           {isSelected && (
-            <div className="mt-3 pt-3 border-t border-gray-100 grid grid-cols-2 gap-2">
-              <div className="text-[10px]">
-                <span className="text-gray-500 block">{t.firstLast}</span>
-                <span className="font-bold">{bus.firstBus} - {bus.lastBus}</span>
+            <div className="mt-2 pt-3 border-t border-gray-100 flex items-center justify-between text-[10px] text-gray-600">
+              <div className="flex gap-4">
+                <span><strong>Frequency:</strong> {bus.frequencyMinutes || 20} min</span>
+                <span><strong>Trips:</strong> {bus.tripsPerDay}</span>
               </div>
-              <div className="text-[10px]">
-                <span className="text-gray-500 block">{t.trips}</span>
-                <span className="font-bold">{bus.tripsPerDay}</span>
-              </div>
-              <button className="col-span-2 mt-2 bg-emerald-50 text-emerald-700 py-2 rounded-lg text-xs font-bold hover:bg-emerald-100 transition-colors">
+              <button className="bg-emerald-600 text-white px-3 py-1.5 rounded-md font-bold hover:bg-emerald-700 shadow-sm transition-colors">
                 {t.walkToRoute}
               </button>
             </div>
